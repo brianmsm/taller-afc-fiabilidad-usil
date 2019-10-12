@@ -1,0 +1,642 @@
+---
+title: "Análisis Factorial Confirmatorio y Confiabilidad en `R`"
+subtitle: "3er CIEP - Usil"
+author: "Brian N. Peña-Calero y Arnold Tafur-Mendoza"
+institute: "Avances en Medición Psicológica (AMP) - UNMSM"      
+date: "12/10/2019" 
+output:
+  xaringan::moon_reader:
+    lib_dir: libs 
+    css: ["amp.css", "amp-fonts.css"]
+    nature:
+      ratio: 16:9
+      highlightStyle: "foundation"
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+---
+class: inverse, center, middle
+
+# .font150[**Temario**]
+
+---
+
+# Temario
+
+1. Modelos Factoriales
+ * Definición y utilidad 
+ * Conceptos: cargas factoriales, errores, variables observables, variables latentes. 
+1. Análisis Factorial Confirmatorio
+ * Diferencias y usos entre el análisis factorial exploratorio y confirmatorio
+ * Concepto y utilidad
+ * Términos básicos: Estimación restringidas (correlación de errores), liberadas, fijas 
+ * Modelos AFC conocidos: Primer orden (ortogonales y oblicuos), segundo orden, bifactor
+ * Procedimientos de análisis: Especificación, Identificación, Estimación, evaluación y re-especificación
+ * Ejemplificación con caso
+1. Fiabilidad por consistencia interna
+ * Problemática de Alfa y la tau-equivalencia
+ * Ventajas de la fiabilidad basado en modelos factoriales
+ * Procedimiento en software
+
+---
+class: inverse, center, middle
+
+# .font120[**Modelos Factoriales**]
+
+---
+
+# Definición y Utilidad
+
+---
+
+# Conceptos básicos
+
+---
+class: inverse, center, middle
+
+# .font120[**Análisis Factorial Confirmatorio**]
+---
+
+# Concepto y Utilidad
+
+---
+
+# Términos Básicos
+
+---
+
+# Modelos AFC conocidos
+
+---
+# Procedimientos de análisis
+<br>
+## 1. Especificación 
+## 2. Identificación
+## 3. Estimación
+## 4. Evaluación 
+## 5. Re-especificación
+
+---
+# Procedimientos de análisis
+
+## 1. Especificación 
+.left-plot[
+```{r echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+graph [layout = neato,
+overlap = true,
+outputorder = edgesfirst] 
+
+node [shape = rectangle]
+a [pos = '-5.0, 0.5!',  label = 'Variable \n Latente', shape = circle]
+b [pos = '-3.0, -0.8!', label = 'Item03']
+c [pos = '-3.0, 0.5!',  label = 'Item02']
+d [pos = '-3.0, 1.8!',  label = 'Item01']
+e [pos = '-2.0, -0.8!', label = 'e3', shape = circle, fixedsize = TRUE, width = 0.4]
+f [pos = '-2.0, 0.5!',  label = 'e2', shape = circle, fixedsize = TRUE, width = 0.4]
+g [pos = '-2.0, 1.8!',  label = 'e1', shape = circle, fixedsize = TRUE, width = 0.4]
+
+a -> d [tailport = 'e', headport = 'w']
+a -> c [tailport = 'e', headport = 'w']
+a -> b [tailport = 'e', headport = 'w']
+e -> b
+f -> c
+g -> d
+}
+", width = 500, height = 550)
+```
+]
+
+.right-code[<br> `lavaan` automatiza la asignación de los errores pertenecientes a cada variable observada (ítem). <br>
+```{r}
+model <- " # Modelo de Medición
+          `Variable Latente` <- Item01 + Item02 + Item03
+         "
+```
+Se crea (`<-`) el objeto `model` donde se **especifica**:
+* Cuántas y como se llaman las variables latentes
+* Cuántos ítems y a donde pertenecen
+
+.center[.font100[*¡Veamos como sería en un modelo más complejo!*]]
+]
+
+---
+# Procedimientos de análisis
+
+## 1. Especificación 
+.left-plot[
+```{r echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+graph [layout = neato,
+overlap = true,
+outputorder = edgesfirst] 
+
+node [shape = rectangle]
+
+# Primer Factor
+a [pos = '-5.0, 1.2!',  label = 'VL1', shape = ellipse]
+b [pos = '-3.0, 0.6!', label = 'Item03']
+c [pos = '-3.0, 1.2!',  label = 'Item02']
+d [pos = '-3.0, 1.8!',  label = 'Item01']
+e [pos = '-2.0, 0.6!', label = 'e3', shape = circle, fixedsize = TRUE, width = 0.4]
+f [pos = '-2.0, 1.2!',  label = 'e2', shape = circle, fixedsize = TRUE, width = 0.4]
+g [pos = '-2.0, 1.8!',  label = 'e1', shape = circle, fixedsize = TRUE, width = 0.4]
+
+# Segundo Factor
+m [pos = '-5.0, -0.9!',  label = 'VL2', shape = ellipse]
+n [pos = '-3.0, -0.3!', label = 'Item04']
+o [pos = '-3.0, -0.9!',  label = 'Item05']
+p [pos = '-3.0, -1.5!',  label = 'Item06']
+q [pos = '-2.0, -0.3!', label = 'e4', shape = circle, fixedsize = TRUE, width = 0.4]
+r [pos = '-2.0, -0.9!',  label = 'e5', shape = circle, fixedsize = TRUE, width = 0.4]
+s [pos = '-2.0, -1.5!',  label = 'e6', shape = circle, fixedsize = TRUE, width = 0.4]
+
+
+
+a -> d [tailport = 'e', headport = 'w']
+a -> c [tailport = 'e', headport = 'w']
+a -> b [tailport = 'e', headport = 'w']
+e -> b
+f -> c
+g -> d
+
+m -> n [tailport = 'e', headport = 'w']
+m -> o [tailport = 'e', headport = 'w']
+m -> p [tailport = 'e', headport = 'w']
+q -> n
+r -> o
+s -> p
+
+a -> m [dir = both]
+
+}
+", width = 450, height = 520)
+```
+]
+
+.right-code[El símbolo .font150[`↔`] hace referencia a la ***covarianza*** entre los factores. 
+```{r eval=FALSE}
+model <- " # Modelo de Medición
+          VL1 <- Item01 + Item02 + Item03
+          VL2 <- Item04 + Item05 + Item06
+          # VL1 ~~ VL2
+         "
+```
+No es necesario especificar `VL1 ~~ VL2`. `lavaan` supone que siempre trabajamos con modelos oblicuos. 
+
+**Nota:** *Más adelante veremos modelos ortogonales.*
+]
+
+---
+# Procedimientos de análisis
+
+## 1. Especificación 
+
+Hay más cosas que podemos especificar en nuestros modelos de medición:
+
+--
+* Igualar las cargas factoriales de alguno o varios ítems
+
+--
+```{r eval=FALSE}
+VL1 =~ a*Item01 + a*Item02 + a*Item03
+```
+
+--
+* Especificar modelos ortogonales
+
+--
+```{r eval=FALSE}
+VL1 ~~ 0*VL2
+```
+
+--
+* Realizar correlación entre errores (covarianza de varianza específica de los ítems)
+
+--
+```{r eval=FALSE}
+# Correlación de errores
+  Item01 ~~ Item02 
+```
+
+---
+# Procedimientos de análisis
+
+## 1. Especificación 
+.left-plot[
+```{r echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+graph [layout = neato,
+overlap = true,
+outputorder = edgesfirst] 
+
+node [shape = rectangle]
+
+# Primer Factor
+a [pos = '-5.0, 1.2!',  label = 'VL1', shape = ellipse]
+b [pos = '-3.0, 0.6!', label = 'Item03']
+c [pos = '-3.0, 1.2!',  label = 'Item02']
+d [pos = '-3.0, 1.8!',  label = 'Item01']
+e [pos = '-2.0, 0.6!', label = 'e3', shape = circle, fixedsize = TRUE, width = 0.4]
+f [pos = '-2.0, 1.2!',  label = 'e2', shape = circle, fixedsize = TRUE, width = 0.4]
+g [pos = '-2.0, 1.8!',  label = 'e1', shape = circle, fixedsize = TRUE, width = 0.4]
+
+# Segundo Factor
+m [pos = '-5.0, -0.9!',  label = 'VL2', shape = ellipse]
+n [pos = '-3.0, -0.3!', label = 'Item04']
+o [pos = '-3.0, -0.9!',  label = 'Item05']
+p [pos = '-3.0, -1.5!',  label = 'Item06']
+q [pos = '-2.0, -0.3!', label = 'e4', shape = circle, fixedsize = TRUE, width = 0.4]
+r [pos = '-2.0, -0.9!',  label = 'e5', shape = circle, fixedsize = TRUE, width = 0.4]
+s [pos = '-2.0, -1.5!',  label = 'e6', shape = circle, fixedsize = TRUE, width = 0.4]
+
+
+
+a -> d [tailport = 'e', headport = 'w']
+a -> c [tailport = 'e', headport = 'w']
+a -> b [tailport = 'e', headport = 'w']
+e -> b
+f -> c
+g -> d
+
+m -> n [tailport = 'e', headport = 'w']
+m -> o [tailport = 'e', headport = 'w']
+m -> p [tailport = 'e', headport = 'w']
+q -> n
+r -> o
+s -> p
+
+a -> m [dir = both]
+q -> r [dir = both]
+}
+", width = 450, height = 520)
+```
+]
+
+.right-code[¡ A resolverlo!]
+
+--
+.right-code[
+```{r eval=FALSE}
+model <- " # Modelo de Medición
+           VL1 <- Item01 + Item02 + Item03
+           VL2 <- Item04 + Item05 + Item06
+           
+           # Correlación de errores
+           Item04 ~~ Item05
+         "
+```
+La varianza específica del `Item04` y del `Item05` son los que se relacionan de alguna manera. Existe algo que distinto a `VL2` que está explicando el comportamiento de las puntuaciones de esos ítems.
+]
+
+---
+# Procedimientos de análisis
+
+## 2. Identificación
+
+Este procedimiento hace referencia a la suficiencia de información para el análisis. Dependiendo de la cantidad de información que tengamos y que solicitemos, podremos encontrar una solución satisfactoria.
+Por ejemplo:
+
+<box-block> 
+X + Y  = 20 <br>
+2X + Y = 28 
+</box-block>
+
+¿Cuánto vale `X` y cuánto vale `Y`?
+
+--
+<br> `X = 8`
+<br> `Y = 12`
+
+.center[.font120[*¿Había suficiente información?*]]
+
+---
+# Procedimientos de análisis
+
+## 2. Identificación
+
+Imaginemos ahora la siguiente situación:
+
+<box-block> 
+ X + Y  = 25 <br>
+2X + 2Y = 50
+</box-block>
+
+¿Cuánto vale `X` y cuánto vale `Y`?
+
+-- 
+Las soluciones pueden ser infinitas
+<br> `X = 10; Y = 15`
+<br> `X = 8; Y = 17`
+<br> `X = 15; Y = 10`
+
+.center[.font120[*¡No tenemos suficiente información!*]]
+
+---
+# Procedimientos de análisis
+
+## 2. Identificación
+
+En el caso de un `AFC` la suficiencia de información hace referencia a la cantidad de correlaciones que existe en una matriz de las variables a analizar (en nuestros casos, los ítems). Esto se contrasta con la información solicitada (`Especificaciòn`).
+
+```{r echo=FALSE}
+library(magrittr)
+```
+
+```{r echo=FALSE}
+lavaan::HolzingerSwineford1939 %>%
+  dplyr::select(x1:x3) %>% 
+  corrr::correlate(diagonal = 1L) %>% 
+  corrr::shave() %>% 
+  corrr::fashion()
+```
+
+.center[.font110[¿Cuántas correlaciones tenemos?]]
+
+--
+.center[`6`]
+
+---
+# Procedimientos de análisis
+
+## 2. Identificación
+
+Veamos otro ejemplo con una cantidad de ítems mayor
+
+```{r echo=FALSE}
+lavaan::HolzingerSwineford1939 %>%
+  dplyr::select(x1:x5) %>% 
+  corrr::correlate(diagonal = 1L) %>% 
+  corrr::shave() %>% 
+  corrr::fashion()
+```
+
+.center[.font110[¿Cuántas correlaciones tenemos?]]
+
+--
+.center[`15`]
+
+---
+# Procedimientos de análisis
+
+## 2. Identificación
+
+¡Último ejemplo! *Nota: Encuentren la regla*
+
+.left-code[
+```{r echo=FALSE}
+lavaan::HolzingerSwineford1939 %>%
+  dplyr::select(x1:x8) %>% 
+  corrr::correlate(diagonal = 1L) %>% 
+  corrr::shave() %>% 
+  corrr::fashion()
+```
+]
+
+.right-code[
+.center[.font110[¿Cuántas correlaciones tenemos?]]
+<br> .center[`36`]
+<br>
+.center[$$Información= \frac{n(n+1)}{2}$$]
+]
+
+---
+# Procedimientos de análisis
+
+## 2. Identificación
+.left-plot[
+```{r echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+graph [layout = neato,
+overlap = true,
+outputorder = edgesfirst] 
+
+node [shape = rectangle]
+a [pos = '-5.0, 0.5!',  label = 'Variable \n Latente', shape = circle]
+b [pos = '-3.0, -0.8!', label = 'Item03']
+c [pos = '-3.0, 0.5!',  label = 'Item02']
+d [pos = '-3.0, 1.8!',  label = 'Item01']
+e [pos = '-2.0, -0.8!', label = 'e3', shape = circle, fixedsize = TRUE, width = 0.4]
+f [pos = '-2.0, 0.5!',  label = 'e2', shape = circle, fixedsize = TRUE, width = 0.4]
+g [pos = '-2.0, 1.8!',  label = 'e1', shape = circle, fixedsize = TRUE, width = 0.4]
+
+a -> d [tailport = 'e', headport = 'w', label = 'λ1']
+a -> c [tailport = 'e', headport = 'w', label = 'λ2']
+a -> b [tailport = 'e', headport = 'w', label = 'λ3']
+e -> b [label = c]
+f -> c [label = b]
+g -> d [label = a]
+}
+", width = 500, height = 550)
+```
+]
+
+.right-code[¿Cuánta información estamos solicitando aquí? 
+En total, solicitamos calcular las `cargas factoriales` (*varianza común*) y el `error de medición` (*varianza específica*):
+<br> Cargas factoriales: `λ1, λ2, λ3`
+<br> Error de medición: `a, b, c`
+
+.center[*Entonces estamos solicitando 6 informaciones*]
+
+Siendo 3 ítems que ingresan al modelo. 
+<br> <br>
+.center[**¿De cuánta información disponemos?**]
+]
+
+---
+# Procedimientos de análisis
+
+## 2. Identificación
+### Notas importantes
+* Mientras tengamos más de 3 ítems en nuestro modelo, no tendremos problemas de identificación (*sub-identificación* o *no identificado*). 
+* En los casos que tenemos modelos con solo 3 ítems, se puede calcular siempre y cuando no se soliciten mayor información (*apenas identificado*) como por ejemplo, `correlación de errores entre ítems`. Debido a que con 3 ítems tenemos 6 cantidad de informaciones y estaríamos solicitando un total de 7 informaciones.
+* No es imposible trabajar con modelos de 2 o 1 ítem (*ítems únicos*), siempre y cuando se empleen algunos artificios. Por ejemplo, igualar cargas factoriales o ingresar información previa sobre algún parámetro (de esta manera no se volverá a calcular).
+
+---
+# Procedimientos de análisis
+
+## 3. Estimación
+
+.center[<b>Tabla Resumen de Estimadores</b>]
+```{r , echo=FALSE}
+knitr::kable(data.frame(
+  Estimadores = c("ML (Máxima Verosimilitud)", "ULS (Mínimos cuadrados ponderados)",
+                  "WLS (Mínimos cuadrados no ponderados)", 
+                  "DWLS (Mínimos cuadrados con diagonal ponderada"),
+  `Estimadores Robustos` = c("MLM, MLR, MLMVS, MLMV", "ULSM, ULSMVS, ULSMV", 
+                             "-", "WLSM, WLSMVS, WLSMV"),
+  Descripciones = c("Datos continuos", "Variables Categóricas", 
+                    "Variables Categóricas",
+                    "Variables Categóricas. Es el más recomendado en la actualidad"),
+  stringsAsFactors = FALSE, check.names = FALSE
+), booktabs = TRUE, align=rep('c', 5), format='html')
+```
+
+---
+# Procedimientos de análisis
+
+## 3. Estimación
+
+Aclaración sobre los sufijos de las nomenclaturas para los **estimadores robustos**:
+* ABC`M`: Trabaja con errores robustos y corrección para chi-cuadrado *Satorra-Bentler*
+* ABC`MVS`: Trabaja con errores robustos y corrección para media-varianza y chi-cuadrado *Satterthwaite*
+* ABC`MV`: Trabaja con errores robustos y corrección para media-varianza y chi-cuadrado *scale-shifted*
+
+Los estudios de simulación coinciden en que la corrección **scale-shifted** es quien brinda mejores resultados siempre y cuando se tenga una cantidad de datos *suficiente* (n > 250, dependiendo de la cantidad de ítems).
+<br>
+Para nuestros casos: Los mejores estimadores a utilizar cuando trabajemos con datos contínuos será `MLR` (en caso de no-normalidad) y `WLSMV` (en caso de datos categóricos).
+
+---
+# Procedimientos de análisis
+
+## 4. Evaluación
+
+Este procedimiento hace referencia al cálculo y valoración de los ***índices de ajuste*** de los modelos estimados, así como a las cargas factoriales calculadas.
+* Estos índices son derivados del test *chi-cuadrado* por lo que a medida que cambie este, el resto de los índices cambiará. 
+* A medida que se emplee un estimador diferente (*recordar que hace correcciones a esta prueba*) y/o aumenten o desciendan el número de ítems/factores, los índices de ajuste cambiarán. 
+* Por último a medida que se ingresen o resten especificaciones al modelo, los **índices de ajuste** cambiarán.
+
+Este procedimiento nos permitirá tomar la decisión de finalizar el análisis en este punto o ir al siguiente paso ***Re-Especificación***.
+
+---
+# Procedimientos de análisis
+
+## 4. Evaluación
+
+```{r , echo=FALSE}
+knitr::kable(data.frame(
+  `Índices de ajuste` = c("χ²", "χ²/gl", "CFI (Comparative Fit Index)", 
+                          "TLI (Tucker Lewis Index) o NNFI (Non-Normed Fit Index)",
+                          "RMSEA (Root Mean Square Error of Approximation)",
+                          "SRMR (Standardized Root Mean Residual)"),
+  `Descriptivos` = c("Test Chi-Cuadrado (bondad de ajuste)", 
+                     "Medida de parsimonia", 
+                     "Medida de ajuste independiente o incremental",
+                     "Medida de ajuste independiente o incremental",
+                     "Evalúa que tan lejos está de un modelo perfecto",
+                     "Evalúa que tan grande es el error de reproducir el modelo"),
+  `Puntos de Corte` = c("No estadísticamente significativo",
+                        "Menor a 3 o 2",
+                        "≥ .90 = ajuste adecuado; ≥ .95 = buen ajuste",
+                        "≥ .90 = ajuste adecuado; ≥ .95 = buen ajuste",
+                        "≥ .10 = ajuste pobre; ≤ .08 = adecuado ajuste, 
+                        ≤ .05 = buen ajuste",
+                        "≤ .08 = buen ajuste, ≤ .06: ideal "),
+  stringsAsFactors = FALSE, check.names = FALSE
+), booktabs = TRUE, align=rep('c', 5), format='html') %>% 
+  kableExtra::collapse_rows(columns = 2:3)
+```
+
+---
+# Procedimientos de análisis
+
+## 5. Re-Especificación
+
+Este procedimiento hace referencia a empezar nuevamente el flujo del análisis, quitar, aumentar algo en el proceso de `Espeficación` que permita tener un modelo factorial idóneo.
+
+Una de las cosas que ayudan en esta etapa es el cálculo de los `índices de modificación`.
+En el paquete `lavaan` podremos realizar rápidamente con la sintaxis:
+```{r eval=FALSE}
+modificationindices()
+```
+
+--
+<br>
+.center[.font150[¿Listos para hacer un ejemplo?]]
+
+---
+
+# Ejemplificación de caso
+
+Para este primer ejemplo usaremos la BD de Holzinger & Swineford (1939). Se tienen 9 pruebas que se estructuran en 3 factores latentes: Visual, Textual y Velocidad.
+```{r eval=FALSE}
+lavaan::HolzingerSwineford1939
+```
+```{r echo=FALSE}
+DT::datatable(
+  lavaan::HolzingerSwineford1939 %>% 
+    dplyr::mutate_if(is.numeric, round, 2),
+  fillContainer = FALSE, options = list(pageLength = 4)
+)
+```
+
+---
+
+# Ejemplificación de caso
+
+## 1. Especificación
+
+```{r}
+model <-  " visual  =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed   =~ x7 + x8 + x9 "
+```
+
+## 2. Identificación y Estimación
+Almacenamos la estimación en el objeto `fit` sobre el cuál consultaremos para obtener información. 
+
+*Recordar:* Es importante el almacenar información con `<-`
+```{r}
+library(lavaan)
+fit <- cfa(model = model,
+           data  = HolzingerSwineford1939)
+```
+
+---
+
+# Ejemplificación de caso
+
+## 4. Evaluación
+
+.scroll-output[
+```{r}
+summary(fit)
+```
+]
+
+---
+
+# Ejemplificación de caso
+
+## 4. Evaluación
+
+.scroll-output[
+```{r}
+summary(fit, fit.measures = TRUE, standardized = TRUE)
+```
+]
+
+---
+
+## 5. Re-Especificación
+
+```{r}
+modindices(fit, sort = TRUE, maximum.number = 10)  
+```
+
+
+---
+class: inverse, center, middle
+
+# .font120[**Fiabilidad por consistencia interna**]
+
+---
+
+# Problemática de Alfa y la tau-equivalencia
+
+
+
+---
+
+# Procedimiento en software
+
+
+---
+class: inverse, center, middle
+
+# .font120[**Gracias**]
+
