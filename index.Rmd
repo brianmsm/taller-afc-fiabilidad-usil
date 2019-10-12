@@ -12,7 +12,7 @@ output:
       ratio: 16:9
       highlightStyle: "foundation"
       highlightLines: true
-      countIncrementalSlides: false
+      countIncrementalSli des: false
       slideNumberFormat: "%current%"
 ---
 class: inverse, center, middle
@@ -45,11 +45,14 @@ class: inverse, center, middle
 
 ---
 
-# Definición y Utilidad
+# Modelos Factoriales
 
----
-
-# Conceptos básicos
+## Definición y Utilidad
+## Conceptos
+* ### Cargas Factoriales
+* ### Errrores
+* ### Variables Observables
+* ### Variables Latentes
 
 ---
 class: inverse, center, middle
@@ -57,15 +60,11 @@ class: inverse, center, middle
 # .font120[**Análisis Factorial Confirmatorio**]
 ---
 
-# Concepto y Utilidad
-
----
-
-# Términos Básicos
-
----
-
-# Modelos AFC conocidos
+# Análisis Factorial Confirmatorio
+* ### Diferencias y usos entre el análisis factorial exploratorio y confirmatorio
+* ### Concepto y utilidad
+* ### Términos básicos: Estimación restringidas (correlación de errores), liberadas, fijas
+* ### Modelos AFC conocidos: Primer orden (ortogonales y oblicuos), segundo orden, bifactor
 
 ---
 # Procedimientos de análisis
@@ -626,14 +625,9 @@ class: inverse, center, middle
 
 ---
 
-# Problemática de Alfa y la tau-equivalencia
-
-
-
----
-
-# Procedimiento en software
-
+# Fiabilidad por consistencia interna
+* ### Problemática de Alfa y la tau-equivalencia
+* ### Procedimiento en software
 
 ---
 class: inverse, center, middle
