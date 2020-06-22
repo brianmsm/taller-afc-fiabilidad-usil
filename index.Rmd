@@ -110,7 +110,7 @@ g -> d
 .right-code[<br> `lavaan` automatiza la asignación de los errores pertenecientes a cada variable observada (ítem). <br>
 ```{r}
 model <- " # Modelo de Medición
-          `Variable Latente` <- Item01 + Item02 + Item03
+          `Variable Latente` =~ Item01 + Item02 + Item03
          "
 ```
 Se crea (`<-`) el objeto `model` donde se **especifica**:
@@ -178,8 +178,8 @@ a -> m [dir = both]
 .right-code[El símbolo .font150[`↔`] hace referencia a la ***covarianza*** entre los factores. 
 ```{r eval=FALSE}
 model <- " # Modelo de Medición
-          VL1 <- Item01 + Item02 + Item03
-          VL2 <- Item04 + Item05 + Item06
+          VL1 =~ Item01 + Item02 + Item03
+          VL2 =~ Item04 + Item05 + Item06
           # VL1 ~~ VL2
          "
 ```
@@ -281,8 +281,8 @@ q -> r [dir = both]
 .right-code[
 ```{r eval=FALSE}
 model <- " # Modelo de Medición
-           VL1 <- Item01 + Item02 + Item03
-           VL2 <- Item04 + Item05 + Item06
+           VL1 =~ Item01 + Item02 + Item03
+           VL2 =~ Item04 + Item05 + Item06
            
            # Correlación de errores
            Item04 ~~ Item05
@@ -463,8 +463,8 @@ Siendo 3 ítems que ingresan al modelo.
 .center[<b>Tabla Resumen de Estimadores</b>]
 ```{r , echo=FALSE}
 knitr::kable(data.frame(
-  Estimadores = c("ML (Máxima Verosimilitud)", "ULS (Mínimos cuadrados ponderados)",
-                  "WLS (Mínimos cuadrados no ponderados)", 
+  Estimadores = c("ML (Máxima Verosimilitud)", "ULS (Mínimos cuadrados no ponderados)",
+                  "WLS (Mínimos cuadrados ponderados)", 
                   "DWLS (Mínimos cuadrados con diagonal ponderada"),
   `Estimadores Robustos` = c("MLM, MLR, MLMVS, MLMV", "ULSM, ULSMVS, ULSMV", 
                              "-", "WLSM, WLSMVS, WLSMV"),
